@@ -49,11 +49,18 @@ extern "C" {
 
 /* USER CODE END EM */
 
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+extern SPI_HandleTypeDef hspi2;
+extern SPI_HandleTypeDef hspi1;
+extern TIM_HandleTypeDef htim2;
+extern TIM_HandleTypeDef htim3;
+extern uint8_t data_buf[256];
+extern volatile uint16_t page_ptr;
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
@@ -63,8 +70,9 @@ void Error_Handler(void);
 #define FLASH_CS_GPIO_Port_GPIO_Port GPIOA
 #define ECG_CS_Pin GPIO_PIN_0
 #define ECG_CS_GPIO_Port GPIOB
-#define my_CTRL_Pin GPIO_PIN_11
-#define my_CTRL_GPIO_Port GPIOB
+#define SPI_CS_Pin GPIO_PIN_12
+#define SPI_CS_GPIO_Port GPIOB
+#define SPI_CS_EXTI_IRQn EXTI15_10_IRQn
 #define LED_Out_Pin GPIO_PIN_15
 #define LED_Out_GPIO_Port GPIOA
 #define ECG_DR_Pin GPIO_PIN_6

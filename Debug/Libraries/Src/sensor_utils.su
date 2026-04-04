@@ -1,0 +1,8 @@
+../Libraries/Src/sensor_utils.c:23:6:sensorSelfCheck	8	static
+../Libraries/Src/sensor_utils.c:35:6:sensorChipInit	8	static
+../Libraries/Src/sensor_utils.c:40:6:resetSensorChip	8	static
+../Libraries/Src/sensor_utils.c:45:6:stopSensorChip	4	static
+../Libraries/Src/sensor_utils.c:49:6:enableSensorChip	4	static
+../Libraries/Src/sensor_utils.c:54:6:resetSensor	8	static
+../Libraries/Src/sensor_utils.c:82:6:startMeasurement	8	static
+../Libraries/Src/sensor_utils.c:92:6:stopMeasurement	8	static

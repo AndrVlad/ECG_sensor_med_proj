@@ -1,0 +1,3 @@
+ADS1293.c:5:6:ADS1293_WriteReg	1
+ADS1293.c:17:9:ads1293readdata	1
+ADS1293.c:32:6:ADS1293_Init	1

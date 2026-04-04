@@ -1,0 +1,3 @@
+../Drivers/ADS1293/ADS1293.c:5:6:ADS1293_WriteReg	24	static
+../Drivers/ADS1293/ADS1293.c:17:9:ads1293readdata	24	static
+../Drivers/ADS1293/ADS1293.c:32:6:ADS1293_Init	8	static

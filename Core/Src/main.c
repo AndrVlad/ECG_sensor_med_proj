@@ -23,7 +23,10 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <string.h>
+#include "ADS1293.h"
 #include "w25q_spi.h"
+#include "SPI_Connection.h"
+#include "protocol_parser.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -34,7 +37,7 @@
 #define REG_MASK_DRDYB 0x20
 #define REG_DATA_LOOP 0x50
 //simulator mode
-#define SDP_MODE 1
+//#define SDP_MODE 1
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -53,6 +56,7 @@ uint8_t ECG_raw[9];
 SPI_HandleTypeDef hspi1;
 SPI_HandleTypeDef hspi2;
 
+TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 
 UART_HandleTypeDef huart1;
@@ -66,6 +70,8 @@ volatile char need_save = 0; // 0-idle, 1-save data
 volatile uint16_t buf_ptr = 0, page_ptr = 0;
 uint8_t res_buf[256] = {0};
 volatile char TIM3_Trig = 0;
+uint8_t data_buf[256];
+bool write_cycle_closed;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -75,6 +81,7 @@ static void MX_SPI2_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_TIM3_Init(void);
+static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -82,36 +89,6 @@ static void MX_TIM3_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 volatile uint8_t dt1[10];
-
-
-
-void ADS1293_WriteReg(uint8_t address, uint8_t data)
-{
-  uint8_t dataToSend[1];
-  uint8_t addrToSend[1];
-  dataToSend[0]=(address & 0x7F);
-  addrToSend[0]=data;
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
-  HAL_SPI_Transmit(&hspi1, dataToSend, 1, HAL_MAX_DELAY);
-  HAL_SPI_Transmit(&hspi1, addrToSend, 1, HAL_MAX_DELAY);
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
-}
-
-
-uint8_t ads1293readdata(uint8_t rdAddress)
-{
-  uint8_t rdData;
-  uint8_t dataToSend[1];
-
-  dataToSend[0]= (rdAddress | 0x80);
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
-  HAL_SPI_Transmit(&hspi1, dataToSend, 1, HAL_MAX_DELAY);
-  HAL_SPI_Receive(&hspi1, &rdData, 1, HAL_MAX_DELAY);
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
-
-
-  return rdData;
-}
 
 uint8_t* getECGdata(void)
 {
@@ -127,47 +104,6 @@ uint8_t* getECGdata(void)
   ECG_raw[7] = ads1293readdata(0x3E); //ch3 MID
   ECG_raw[6] = ads1293readdata(0x3F); //ch3 LSB
   return ECG_raw;
-}
-
-void ADS1293_Init()
-{
-  // Write initial configuration
-  ADS1293_WriteReg(0x00, 0x00); // Stopt data conversion
-  HAL_Delay(500);
-  ADS1293_WriteReg(0x01, 0x11); // Set input multiplexer 11
-  HAL_Delay(1);
-  ADS1293_WriteReg(0x02, 0x19); // Set input multiplexer for channel 2
-  HAL_Delay(1);
-  ADS1293_WriteReg(0x03, 0x2E); // From Selikhov
-  HAL_Delay(1);
-  ADS1293_WriteReg(0x0A, 0x07); // Enable CMDET for IN1, IN2, IN3
-  HAL_Delay(1);
-  ADS1293_WriteReg(0x0C, 0x04); // Connect RLD amplifier to IN4
-  HAL_Delay(1);
-  ADS1293_WriteReg(0x0D, 0x01); // From Selikhov
-  HAL_Delay(1);
-  ADS1293_WriteReg(0x0E, 0x02); // From Selikhov
-  HAL_Delay(1);
-  ADS1293_WriteReg(0x0F, 0x03); // From Selikhov
-  HAL_Delay(1);
-  ADS1293_WriteReg(0x10, 0x01); // From Selikhov
-  HAL_Delay(1);
-  ADS1293_WriteReg(0x12, 0x04); // Use external crystal
-  HAL_Delay(1);
-  ADS1293_WriteReg(0x21, 0x02); // Set R2 decimation rate to 6 (was 0x02)
-  HAL_Delay(1);
-  ADS1293_WriteReg(0x22, 0x02); // Set R3 decimation rate to 16 for channel 1 (was 0x02)
-  HAL_Delay(1);
-  ADS1293_WriteReg(0x23, 0x02); // Set R3 decimation rate to 16 for channel 2 (was 0x02)
-  HAL_Delay(1);
-  ADS1293_WriteReg(0x24, 0x02); // Set R3 decimation rate to 16 for channel 3 (Selikhov) (was 0x02)
-  HAL_Delay(1);
-  ADS1293_WriteReg(0x27, 0x08); // Set DRDYB source to channel 1 ECG
-  HAL_Delay(1);
-  ADS1293_WriteReg(0x2F, 0x70); // Selikhov
-  HAL_Delay(1);
-  ADS1293_WriteReg(0x00, 0x01); // Start data conversion
-  HAL_Delay(1);
 }
 
 void myDelay(void);
@@ -206,16 +142,11 @@ int main(void)
   MX_USART1_UART_Init();
   MX_SPI1_Init();
   MX_TIM3_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3 | GPIO_PIN_4, GPIO_PIN_SET);
+  sensorInit();
 
-  W25_Ini(0);
-  HAL_TIM_Base_Start_IT(&htim3); //start timer
-
-  HAL_Delay(100);
-  ADS1293_Init();
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET); //LED off
-  HAL_Delay(10);
+  static uint8_t page_save_buf[256], page_save_buf_ptr = 0; //256 byte temp buf for flash page and ptr to its head
 
   /* USER CODE END 2 */
 
@@ -223,6 +154,104 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  if (spi_rx_complete) {
+		  spi_rx_complete = false;
+		  parserFSM();
+	  }
+
+	 //commands
+	  if(dt1[0] == '0') //erase mem
+	  {
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
+		W25_Erase_Chip();
+		page_ptr = 0;
+#ifndef SDP_MODE
+		uint8_t pData[5] = {"0!\r\n"};
+		HAL_UART_Transmit(&huart1, pData, 4, 100);
+#endif
+	  }
+	  if(dt1[0] == '1') //start measure
+	  {
+		uart_mode = 0;
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
+		need_save = 1;
+		//test.number = 0;
+#ifndef SDP_MODE
+		uint8_t pData[5] = {"1!\r\n"};
+		HAL_UART_Transmit(&huart1, pData, 4, 100);
+#endif
+	  }
+	  if(dt1[0] == '2') //stop measure
+	  {
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
+		W25_Ini(0);
+		need_save = 0;
+#ifndef SDP_MODE
+		uint8_t pData[5] = {"2!\r\n"};
+		HAL_UART_Transmit(&huart1, pData, 4, 100);
+#endif
+	  }
+	  if(dt1[0] == '3') //read mem, page addr in dt1[2..1]
+	  {
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
+
+#ifdef SDP_MODE
+		for ( uint32_t read_page_addr = 0; read_page_addr < 3900; read_page_addr++)
+		{
+		  W25_Read_Page(data_buf, read_page_addr, 0, w25_info.PageSize);
+		  if ( (data_buf[0] == 0xFF) && (data_buf[1] == 0xFF) && (data_buf[2] == 0xFF) )
+			break;
+		  HAL_UART_Transmit(&huart1, data_buf, 256, 100);
+		}
+#endif
+
+#ifndef SDP_MODE
+		uint32_t read_page_addr = (dt1[2]<<8);
+		read_page_addr |= dt1[1];
+		W25_Read_Page(data_buf, read_page_addr, 0, w25_info.PageSize);
+		HAL_UART_Transmit(&huart1, data_buf, w25_info.PageSize, 100);
+		uint8_t pData[7] = {"\r\n3!\r\n"};
+		HAL_UART_Transmit(&huart1, pData, 6, 100);
+#endif
+	  }
+
+   //ECG MODULE
+	if(TIM3_Trig == 1)
+	{
+	  TIM3_Trig = 0;
+	  getECGdata();
+
+	  if (need_save)
+	  {
+		//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
+		//HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_15);
+
+		for ( int i = 0; i < 9; i++) //copy data to buf
+		{
+		  page_save_buf[page_save_buf_ptr+i] = ECG_raw[i];
+		}
+		page_save_buf_ptr += 9; //add 9 written bytes
+		if (page_save_buf_ptr >= 252) //buffer is full, saving to flash
+		{
+		  page_save_buf_ptr = 0;
+		  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_15);
+		  if (uart_mode == 1)
+			HAL_UART_Transmit(&huart1, page_save_buf, 256, 300);
+			//;
+		  else
+			W25_Write_Page(page_save_buf, page_ptr, 0, w25_info.PageSize); //programming flah
+		  if(page_ptr == 65535) {
+			  write_cycle_closed = 1;
+		  }
+		  page_ptr++; //inc page ptr
+
+		}
+	  }
+	  else
+	  {
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
+	  }
+	}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -329,7 +358,7 @@ static void MX_SPI2_Init(void)
   hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
   hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi2.Init.NSS = SPI_NSS_HARD_INPUT;
+  hspi2.Init.NSS = SPI_NSS_SOFT;
   hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -341,6 +370,69 @@ static void MX_SPI2_Init(void)
   /* USER CODE BEGIN SPI2_Init 2 */
 
   /* USER CODE END SPI2_Init 2 */
+
+}
+
+/**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 72;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 501;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_OnePulse_Init(&htim2, TIM_OPMODE_SINGLE) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 1;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+  HAL_TIM_MspPostInit(&htim2);
 
 }
 
@@ -442,7 +534,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, FLASH_nRST_Pin|FLASH_CS_GPIO_Port_Pin|LED_Out_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, ECG_CS_Pin|my_CTRL_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(ECG_CS_GPIO_Port, ECG_CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : FLASH_nRST_Pin FLASH_CS_GPIO_Port_Pin LED_Out_Pin */
   GPIO_InitStruct.Pin = FLASH_nRST_Pin|FLASH_CS_GPIO_Port_Pin|LED_Out_Pin;
@@ -451,12 +543,18 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : ECG_CS_Pin my_CTRL_Pin */
-  GPIO_InitStruct.Pin = ECG_CS_Pin|my_CTRL_Pin;
+  /*Configure GPIO pin : ECG_CS_Pin */
+  GPIO_InitStruct.Pin = ECG_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(ECG_CS_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : SPI_CS_Pin */
+  GPIO_InitStruct.Pin = SPI_CS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(SPI_CS_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : ECG_DR_Pin */
   GPIO_InitStruct.Pin = ECG_DR_Pin;
@@ -471,8 +569,11 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(ECG_ALARM_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 2, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 1, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
