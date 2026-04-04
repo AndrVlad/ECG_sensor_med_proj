@@ -595,8 +595,8 @@ void sensorInit() {
 	initSPIConnection();
 
 	// включение таймера формирования сигнала CTRL
-	HAL_TIM_OnePulse_Start(&htim2, TIM_CHANNEL_4);
-
+	//HAL_TIM_OnePulse_Start(&htim2, TIM_CHANNEL_4);
+	MY_HAL_TIM_OnePulse_Start(&htim2, TIM_CHANNEL_4);
 	// задержка для удержания линии в активном уровне
 	HAL_Delay(1);
 	// отправка сигнала на CTRL для уведомления мастера о подключении датчика
