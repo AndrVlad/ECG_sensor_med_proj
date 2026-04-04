@@ -31,7 +31,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdbool.h>
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -61,6 +61,7 @@ extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
 extern uint8_t data_buf[256];
 extern volatile uint16_t page_ptr;
+extern bool write_cycle_closed;
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

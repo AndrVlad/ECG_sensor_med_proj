@@ -71,7 +71,7 @@ volatile uint16_t buf_ptr = 0, page_ptr = 0;
 uint8_t res_buf[256] = {0};
 volatile char TIM3_Trig = 0;
 uint8_t data_buf[256];
-bool write_cycle_closed;
+bool write_cycle_closed = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/

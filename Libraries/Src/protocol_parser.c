@@ -142,6 +142,9 @@ void updateNumAvailableMeasData() {
 	if (read.last_page_num < (page_ptr - 1)) {
 		read.num_ready_bytes = 252;
 		return;
+	} else {
+		read.num_ready_bytes = 0;
+		return;
 	}
 }
 #endif
@@ -325,7 +328,7 @@ void fillResponseFrame(uint16_t response_code, uint16_t command_code) {
 	}
 
 	// для отладки
-	response[254] = page_ptr << 8;
+	response[254] = page_ptr >> 8;
 	response[255] = page_ptr & 0xFF;
 	response[256] = read.last_page_num;
 	response[257] = FSM_state;
@@ -593,6 +596,7 @@ void sensorInit() {
 
 	// включение таймера формирования сигнала CTRL
 	HAL_TIM_OnePulse_Start(&htim2, TIM_CHANNEL_4);
+
 	// задержка для удержания линии в активном уровне
 	HAL_Delay(1);
 	// отправка сигнала на CTRL для уведомления мастера о подключении датчика

@@ -4,5 +4,5 @@
 ../Libraries/Src/sensor_utils.c:45:6:stopSensorChip	4	static
 ../Libraries/Src/sensor_utils.c:49:6:enableSensorChip	4	static
 ../Libraries/Src/sensor_utils.c:54:6:resetSensor	8	static
-../Libraries/Src/sensor_utils.c:82:6:startMeasurement	8	static
-../Libraries/Src/sensor_utils.c:92:6:stopMeasurement	8	static
+../Libraries/Src/sensor_utils.c:84:6:startMeasurement	8	static
+../Libraries/Src/sensor_utils.c:94:6:stopMeasurement	8	static

@@ -62,10 +62,12 @@ void resetSensor() {
 #ifndef MULTICHANNEL_VERSION
     page_pos_ptr = 0;
     page_ptr = 0;
+
 #endif
 
 #ifdef MULTICHANNEL_VERSION
     page_ptr = 0;
+    write_cycle_closed = 0;
 #endif
     // сброс микросхемы датчика
     resetSensorChip();
