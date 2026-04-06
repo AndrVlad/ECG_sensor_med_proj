@@ -108,58 +108,6 @@ uint8_t* getECGdata(void)
 
 void myDelay(void);
 
-
-HAL_StatusTypeDef MY_HAL_TIM_OnePulse_Start(TIM_HandleTypeDef *htim, uint32_t OutputChannel)
-{
-  HAL_TIM_ChannelStateTypeDef channel_1_state = TIM_CHANNEL_STATE_GET(htim, TIM_CHANNEL_1);
-  HAL_TIM_ChannelStateTypeDef channel_2_state = TIM_CHANNEL_STATE_GET(htim, TIM_CHANNEL_2);
-  HAL_TIM_ChannelStateTypeDef channel_4_state = TIM_CHANNEL_STATE_GET(htim, TIM_CHANNEL_4);
-  HAL_TIM_ChannelStateTypeDef complementary_channel_1_state = TIM_CHANNEL_N_STATE_GET(htim, TIM_CHANNEL_1);
-  HAL_TIM_ChannelStateTypeDef complementary_channel_2_state = TIM_CHANNEL_N_STATE_GET(htim, TIM_CHANNEL_2);
-  HAL_TIM_ChannelStateTypeDef complementary_channel_4_state = TIM_CHANNEL_N_STATE_GET(htim, TIM_CHANNEL_4);
-  /* Prevent unused argument(s) compilation warning */
-  UNUSED(OutputChannel);
-
-  /* Check the TIM channels state */
-  if ((channel_1_state != HAL_TIM_CHANNEL_STATE_READY)
-      || (channel_2_state != HAL_TIM_CHANNEL_STATE_READY)
-      || (complementary_channel_1_state != HAL_TIM_CHANNEL_STATE_READY)
-      || (complementary_channel_2_state != HAL_TIM_CHANNEL_STATE_READY))
-  {
-    return HAL_ERROR;
-  }
-
-  /* Set the TIM channels state */
-  TIM_CHANNEL_STATE_SET(htim, TIM_CHANNEL_1, HAL_TIM_CHANNEL_STATE_BUSY);
-  TIM_CHANNEL_STATE_SET(htim, TIM_CHANNEL_2, HAL_TIM_CHANNEL_STATE_BUSY);
-  TIM_CHANNEL_STATE_SET(htim, TIM_CHANNEL_4, HAL_TIM_CHANNEL_STATE_BUSY);
-  TIM_CHANNEL_N_STATE_SET(htim, TIM_CHANNEL_1, HAL_TIM_CHANNEL_STATE_BUSY);
-  TIM_CHANNEL_N_STATE_SET(htim, TIM_CHANNEL_2, HAL_TIM_CHANNEL_STATE_BUSY);
-  TIM_CHANNEL_N_STATE_SET(htim, TIM_CHANNEL_4, HAL_TIM_CHANNEL_STATE_BUSY);
-
-  /* Enable the Capture compare and the Input Capture channels
-    (in the OPM Mode the two possible channels that can be used are TIM_CHANNEL_1 and TIM_CHANNEL_2)
-    if TIM_CHANNEL_1 is used as output, the TIM_CHANNEL_2 will be used as input and
-    if TIM_CHANNEL_1 is used as input, the TIM_CHANNEL_2 will be used as output
-    whatever the combination, the TIM_CHANNEL_1 and TIM_CHANNEL_2 should be enabled together
-
-    No need to enable the counter, it's enabled automatically by hardware
-    (the counter starts in response to a stimulus and generate a pulse */
-
-  TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_1, TIM_CCx_ENABLE);
-  TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_2, TIM_CCx_ENABLE);
-  TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_4, TIM_CCx_ENABLE);
-
-  if (IS_TIM_BREAK_INSTANCE(htim->Instance) != RESET)
-  {
-    /* Enable the main output */
-    __HAL_TIM_MOE_ENABLE(htim);
-  }
-
-  /* Return function status */
-  return HAL_OK;
-}
-
 HAL_StatusTypeDef MY_HAL_TIM_OnePulse_Init(TIM_HandleTypeDef *htim, uint32_t OnePulseMode)
 {
   /* Check the TIM handle allocation */
@@ -224,6 +172,8 @@ HAL_StatusTypeDef MY_HAL_TIM_OnePulse_Init(TIM_HandleTypeDef *htim, uint32_t One
 
   return HAL_OK;
 }
+
+
 
 /* USER CODE END 0 */
 
@@ -486,7 +436,7 @@ static void MX_SPI2_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN SPI2_Init 2 */
-
+  __HAL_SPI_ENABLE_IT(&hspi2, SPI_IT_ERR);
   /* USER CODE END SPI2_Init 2 */
 
 }
@@ -698,6 +648,68 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi) {
+
+    if (hspi->Instance == SPI2) {
+    	HAL_SPI_DeInit(&hspi2);
+    	HAL_Delay(1);
+    	HAL_SPI_Init(&hspi2);
+
+    	resetSPIConnection();
+    }
+}
+
+HAL_StatusTypeDef MY_HAL_TIM_OnePulse_Start(TIM_HandleTypeDef *htim, uint32_t OutputChannel)
+{
+  HAL_TIM_ChannelStateTypeDef channel_1_state = TIM_CHANNEL_STATE_GET(htim, TIM_CHANNEL_1);
+  HAL_TIM_ChannelStateTypeDef channel_2_state = TIM_CHANNEL_STATE_GET(htim, TIM_CHANNEL_2);
+  HAL_TIM_ChannelStateTypeDef channel_4_state = TIM_CHANNEL_STATE_GET(htim, TIM_CHANNEL_4);
+  HAL_TIM_ChannelStateTypeDef complementary_channel_1_state = TIM_CHANNEL_N_STATE_GET(htim, TIM_CHANNEL_1);
+  HAL_TIM_ChannelStateTypeDef complementary_channel_2_state = TIM_CHANNEL_N_STATE_GET(htim, TIM_CHANNEL_2);
+  HAL_TIM_ChannelStateTypeDef complementary_channel_4_state = TIM_CHANNEL_N_STATE_GET(htim, TIM_CHANNEL_4);
+  /* Prevent unused argument(s) compilation warning */
+  UNUSED(OutputChannel);
+
+  /* Check the TIM channels state */
+  if ((channel_1_state != HAL_TIM_CHANNEL_STATE_READY)
+      || (channel_2_state != HAL_TIM_CHANNEL_STATE_READY)
+      || (complementary_channel_1_state != HAL_TIM_CHANNEL_STATE_READY)
+      || (complementary_channel_2_state != HAL_TIM_CHANNEL_STATE_READY))
+  {
+    return HAL_ERROR;
+  }
+
+  /* Set the TIM channels state */
+  TIM_CHANNEL_STATE_SET(htim, TIM_CHANNEL_1, HAL_TIM_CHANNEL_STATE_BUSY);
+  TIM_CHANNEL_STATE_SET(htim, TIM_CHANNEL_2, HAL_TIM_CHANNEL_STATE_BUSY);
+  TIM_CHANNEL_STATE_SET(htim, TIM_CHANNEL_4, HAL_TIM_CHANNEL_STATE_BUSY);
+  TIM_CHANNEL_N_STATE_SET(htim, TIM_CHANNEL_1, HAL_TIM_CHANNEL_STATE_BUSY);
+  TIM_CHANNEL_N_STATE_SET(htim, TIM_CHANNEL_2, HAL_TIM_CHANNEL_STATE_BUSY);
+  TIM_CHANNEL_N_STATE_SET(htim, TIM_CHANNEL_4, HAL_TIM_CHANNEL_STATE_BUSY);
+
+  /* Enable the Capture compare and the Input Capture channels
+    (in the OPM Mode the two possible channels that can be used are TIM_CHANNEL_1 and TIM_CHANNEL_2)
+    if TIM_CHANNEL_1 is used as output, the TIM_CHANNEL_2 will be used as input and
+    if TIM_CHANNEL_1 is used as input, the TIM_CHANNEL_2 will be used as output
+    whatever the combination, the TIM_CHANNEL_1 and TIM_CHANNEL_2 should be enabled together
+
+    No need to enable the counter, it's enabled automatically by hardware
+    (the counter starts in response to a stimulus and generate a pulse */
+
+  TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_1, TIM_CCx_ENABLE);
+  TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_2, TIM_CCx_ENABLE);
+  TIM_CCxChannelCmd(htim->Instance, TIM_CHANNEL_4, TIM_CCx_ENABLE);
+
+  if (IS_TIM_BREAK_INSTANCE(htim->Instance) != RESET)
+  {
+    /* Enable the main output */
+    __HAL_TIM_MOE_ENABLE(htim);
+  }
+
+  /* Return function status */
+  return HAL_OK;
+}
 
 /* USER CODE END 4 */
 
