@@ -25,11 +25,72 @@ bool sensorSelfCheck() {
 #ifdef TEST_VERSION
 	return true;
 #endif
-	if(ads1293readdata(0x40) == 0x1) {
-		return true;
-	} else {
+
+	if(!(ads1293readdata(0x01) == 0x11)) {
 		return false;
 	}
+
+	if(!(ads1293readdata(0x02) == 0x19)) {
+		return false;
+	}
+
+	if(!(ads1293readdata(0x03) == 0x2E)) {
+		return false;
+	}
+
+	if(!(ads1293readdata(0x0A) == 0x07)) {
+		return false;
+	}
+
+	if(!(ads1293readdata(0x0C) == 0x04)) {
+		return false;
+	}
+
+	if(!(ads1293readdata(0x0D) == 0x01)) {
+		return false;
+	}
+
+	if(!(ads1293readdata(0x0E) == 0x02)) {
+		return false;
+	}
+
+	if(!(ads1293readdata(0x0F) == 0x03)) {
+		return false;
+	}
+
+	if(!(ads1293readdata(0x10) == 0x01)) {
+		return false;
+	}
+
+	if(!(ads1293readdata(0x12) ==  0x04)) {
+		return false;
+	}
+
+	if(!(ads1293readdata(0x21) == 0x02)) {
+		return false;
+	}
+
+	if(!(ads1293readdata(0x22) == 0x02)) {
+		return false;
+	}
+
+	if(!(ads1293readdata(0x23) == 0x02)) {
+		return false;
+	}
+
+	if(!(ads1293readdata(0x24) == 0x02)) {
+		return false;
+	}
+
+	if(!(ads1293readdata(0x27) == 0x08)) {
+		return false;
+	}
+
+	if(!(ads1293readdata(0x2F) == 0x70)) {
+		return false;
+	}
+
+	return true;
 }
 
 void sensorChipInit() {
@@ -95,7 +156,7 @@ void stopMeasurement() {
 
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
 	W25_Ini(0);
-	// сброс флага записи данных во флеш-память (равносильно началу измерения)
+	// сброс флага записи данных во флеш-память (равносильно окончанию измерения)
 	need_save = 0;
 	//stopSensorChip();
 	return;
