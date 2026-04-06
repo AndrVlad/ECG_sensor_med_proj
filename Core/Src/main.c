@@ -359,8 +359,10 @@ int main(void)
 			W25_Write_Page(page_save_buf, page_ptr, 0, w25_info.PageSize); //programming flah
 		  if(page_ptr == 65535) {
 			  write_cycle_closed = 1;
+			  need_save = 0;
+		  } else {
+			  page_ptr++; //inc page ptr
 		  }
-		  page_ptr++; //inc page ptr
 
 		}
 	  }
@@ -369,6 +371,16 @@ int main(void)
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
 	  }
 	}
+
+	if (reach_end_of_flash && !response_ready) {
+		reach_end_of_flash = 0;
+		setFSMProtocolState(RESET_FLASH_STATE);
+		page_ptr = 0;
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
+		W25_Erase_Chip();
+		reset_ready = 1;
+	}
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

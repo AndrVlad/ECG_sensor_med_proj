@@ -255,6 +255,7 @@ void fillDataField() {
 		read.last_page_num = -1;
 		// сброс признака того, что указатель записи записывает данные по следующему кругу
 		write_cycle_closed = 0;
+		reach_end_of_flash = 1;
 	}
 
 }
@@ -551,6 +552,24 @@ void parserFSM() {
 					response_ready = 0;
 				}
 			}
+			if (safe_command_frame[2] == CMD_CRC_ANS_ERR) {
+				sendPreviousResponse();
+			}
+		case RESET_FLASH_STATE:
+
+			if (safe_command_frame[2] == CMD_CRC_ANS_ERR) {
+				sendPreviousResponse();
+			} else {
+				if (reset_ready) {
+					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
+					//fillResponseFrame(STATE_RESET, CMD_RESET);
+					setFSMProtocolState(READY_STATE);
+					reset_ready = 0;
+				} else {
+					response_ready = 0;
+				}
+			}
+			break;
 
 	}
 };
