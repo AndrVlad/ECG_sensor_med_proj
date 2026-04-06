@@ -11,6 +11,7 @@
 #include "w25q_spi.h"
 #include "protocol_parser.h"
 #include "SPI_Connection.h"
+#include "protocol_common.h"
 #include "ADS1293.h"
 #include <stdbool.h>
 #include <stdint.h>

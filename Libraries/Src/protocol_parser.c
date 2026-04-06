@@ -40,7 +40,7 @@ bool reset_ready = 0;
 #ifndef MULTICHANNEL_VERSION
 // хранит информацию о страницах и позициях, которые были считаны с флеш
 struct {
-	uint8_t cur_page_num;     		// номер текущей страницы с которой происходит чтение
+	uint32_t cur_page_num;     		// номер текущей страницы с которой происходит чтение
 	int8_t page_offset_read;	// смещение в словах (слово = 2 байта) которое было считано в последний раз
 	uint8_t num_ready_bytes; 	// число готовых для считывания данных в рамках текущей страницы
 } read = {.cur_page_num = 0, .page_offset_read = -1, .num_ready_bytes = 0};
@@ -328,10 +328,12 @@ void fillResponseFrame(uint16_t response_code, uint16_t command_code) {
 	}
 
 	// для отладки
+	/*
 	response[254] = page_ptr >> 8;
 	response[255] = page_ptr & 0xFF;
 	response[256] = read.last_page_num;
 	response[257] = FSM_state;
+	*/
 
 	response[258] = 0xFF;
 	response[259] = 0x0D;
@@ -595,8 +597,13 @@ void sensorInit() {
 	initSPIConnection();
 
 	// включение таймера формирования сигнала CTRL
-	//HAL_TIM_OnePulse_Start(&htim2, TIM_CHANNEL_4);
+#ifndef MULTICHANNEL_VERSION
+	HAL_TIM_OnePulse_Start(&htim2, TIM_CHANNEL_1);
+#endif
+
+#ifdef MULTICHANNEL_VERSION
 	MY_HAL_TIM_OnePulse_Start(&htim2, TIM_CHANNEL_4);
+#endif
 	// задержка для удержания линии в активном уровне
 	HAL_Delay(1);
 	// отправка сигнала на CTRL для уведомления мастера о подключении датчика

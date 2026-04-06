@@ -1,8 +1,8 @@
-sensor_utils.c:23:6:sensorSelfCheck	17
-sensor_utils.c:96:6:sensorChipInit	1
-sensor_utils.c:101:6:resetSensorChip	1
-sensor_utils.c:106:6:stopSensorChip	1
-sensor_utils.c:110:6:enableSensorChip	1
-sensor_utils.c:115:6:resetSensor	1
-sensor_utils.c:145:6:startMeasurement	1
-sensor_utils.c:155:6:stopMeasurement	1
+sensor_utils.c:24:6:sensorSelfCheck	17
+sensor_utils.c:97:6:sensorChipInit	1
+sensor_utils.c:102:6:resetSensorChip	1
+sensor_utils.c:107:6:stopSensorChip	1
+sensor_utils.c:111:6:enableSensorChip	1
+sensor_utils.c:116:6:resetSensor	1
+sensor_utils.c:146:6:startMeasurement	1
+sensor_utils.c:156:6:stopMeasurement	1

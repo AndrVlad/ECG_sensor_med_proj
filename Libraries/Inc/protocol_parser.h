@@ -8,9 +8,6 @@
 #ifndef INC_PROTOCOL_PARSER_H_
 #define INC_PROTOCOL_PARSER_H_
 
-
-#define MULTICHANNEL_VERSION 1
-
 extern bool reset_ready;
 
 enum FSM_States {
