@@ -72,6 +72,7 @@ uint8_t res_buf[256] = {0};
 volatile char TIM3_Trig = 0;
 uint8_t data_buf[256];
 bool write_cycle_closed = 0;
+bool reach_end_of_flash = 0; // флаг достижения конца флеш-памяти при чтении
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -372,12 +373,24 @@ int main(void)
 	  }
 	}
 
+	// проверка на то, что флеш-память была считана до конца и был отправлен последний кадр данных
 	if (reach_end_of_flash && !response_ready) {
+		// сброс признака чтения конца флеш-памяти
 		reach_end_of_flash = 0;
+
+		// сохранение последнего внутреннего состояния датчика
+		setLastFSMProtocolState(getFSMProtocolState());
+		// переход в состояние сброса флеш-памяти
 		setFSMProtocolState(RESET_FLASH_STATE);
+
+		// сброс указателя номера записываемой страницы флеш
 		page_ptr = 0;
+
+		// очистка флеш-памяти
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
 		W25_Erase_Chip();
+
+		// установка признака окончания стирания флеш-памяти (флаг проверяется в состоянии RESET_FLASH_STATE)
 		reset_ready = 1;
 	}
 

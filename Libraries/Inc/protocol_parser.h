@@ -16,7 +16,8 @@ enum FSM_States {
 	MEASUREMENT_STATE,
 	EXCHANGE_STATE,
 	MEASUREMENT_EXCHANGE_STATE,
-	RESET_STATE
+	RESET_STATE,
+	RESET_FLASH_STATE
 };
 
 void parserFSM();
@@ -28,5 +29,7 @@ bool checkCRC32(uint8_t* command_frame, uint16_t length);
 uint32_t calculateCRC32(uint8_t* arg,uint16_t length);
 
 void setFSMProtocolState(uint8_t state);
+void setLastFSMProtocolState(uint8_t state);
+uint8_t getFSMProtocolState();
 
 #endif /* INC_PROTOCOL_PARSER_H_ */

@@ -62,6 +62,7 @@ extern TIM_HandleTypeDef htim3;
 extern uint8_t data_buf[256];
 extern volatile uint16_t page_ptr;
 extern bool write_cycle_closed;
+extern bool reach_end_of_flash;
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

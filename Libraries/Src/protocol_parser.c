@@ -26,7 +26,7 @@ uint8_t response[FRAME_LEN] = {0};
 uint16_t meas_request_cnt = 0;						// флаг запроса на выполнение измерения
 uint16_t sensor_state = STATE_NOT_READY;			// внутреннее состояние датчика (работоспособность)
 uint16_t measurement_state = STATE_NOT_READY;		// статус готовности результата измерения
-uint8_t FSM_state;									// текущее состояние FSM
+uint8_t FSM_state, FSM_last_state;					// текущее состояние FSM
 uint8_t measurement_bytes_num = 0;					// число фактически готовых байт измерения
 bool reset_ready = 0;
 
@@ -103,8 +103,17 @@ void sendInitCTRL();
 void sendRxCompleteCTRL();
 /* реализация функций */
 
+uint8_t getFSMProtocolState() {
+	return FSM_state;
+}
+
+/* Задает новое состояние */
 void setFSMProtocolState(uint8_t state) {
 	FSM_state = state;
+}
+/* Сохраняет последнее состояние */
+void setLastFSMProtocolState(uint8_t state) {
+	FSM_last_state = state;
 }
 
 #ifdef MULTICHANNEL_VERSION
@@ -255,6 +264,7 @@ void fillDataField() {
 		read.last_page_num = -1;
 		// сброс признака того, что указатель записи записывает данные по следующему кругу
 		write_cycle_closed = 0;
+		// установка признака чтения конца флеш-памяти
 		reach_end_of_flash = 1;
 	}
 
@@ -559,18 +569,34 @@ void parserFSM() {
 
 			if (safe_command_frame[2] == CMD_CRC_ANS_ERR) {
 				sendPreviousResponse();
-			} else {
+				break;
+			}
+
+			if(safe_command_frame[2] == CMD_STATUS) {
 				if (reset_ready) {
 					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
-					//fillResponseFrame(STATE_RESET, CMD_RESET);
-					setFSMProtocolState(READY_STATE);
+
+					// восстановление предыдущего состояния
+					setFSMProtocolState(FSM_last_state);
+
+					// сброс состояния чтения флеш-памяти
+					read.last_page_num = -1;
+					read.num_ready_bytes = 0;
+
+					// восстановление признака необходимости проведения измерения далее
+					if(FSM_last_state == MEASUREMENT_EXCHANGE_STATE || FSM_last_state == MEASUREMENT_STATE) {
+						need_save = 1;
+					}
+
+					// сброс признака окончания сброса флеш
 					reset_ready = 0;
-				} else {
+				} else { // если сброс еще не выполнен, тогда будет отправляться кадр ответа STATE_WAIT
 					response_ready = 0;
 				}
+			} else { // для всех остальных команд будет отправляться кадр ответа STATE_WAIT
+				response_ready = 0;
 			}
 			break;
-
 	}
 };
 
@@ -644,7 +670,7 @@ void sendRxCompleteCTRL() {
 #ifdef MULTICHANNEL_VERSION
 void resetFSMProtocol() {
 	setFSMProtocolState(RESET_STATE);
-	read.last_page_num = 0;
+	read.last_page_num = -1;
 	read.num_ready_bytes = 0;
 	response_ready = 0;
 	need_save = 0;
