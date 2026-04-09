@@ -260,7 +260,7 @@ void fillDataField() {
 	}
 
 	// сброс указателя страниц в начальное значение при достижении последней страницы флеш-памяти
-	if (read.last_page_num == LIMIT_FLASH_PAGE_NUM - 1) {
+	if (read.last_page_num == LIMIT_FLASH_PAGE_NUM - 2) {
 		read.last_page_num = -1;
 		// сброс признака того, что указатель записи записывает данные по следующему кругу
 		write_cycle_closed = 0;

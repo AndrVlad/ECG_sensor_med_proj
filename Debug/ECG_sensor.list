@@ -15687,10 +15687,10 @@ void fillDataField() {
 	}
 
 	// сброс указателя страниц в начальное значение при достижении последней страницы флеш-памяти
-	if (read.last_page_num == LIMIT_FLASH_PAGE_NUM - 1) {
+	if (read.last_page_num == LIMIT_FLASH_PAGE_NUM - 2) {
  8005922:	4b0a      	ldr	r3, [pc, #40]	; (800594c <fillDataField+0xb8>)
  8005924:	681b      	ldr	r3, [r3, #0]
- 8005926:	f64f 72ff 	movw	r2, #65535	; 0xffff
+ 8005926:	f64f 72fe 	movw	r2, #65534	; 0xfffe
  800592a:	4293      	cmp	r3, r2
  800592c:	d10b      	bne.n	8005946 <fillDataField+0xb2>
 		read.last_page_num = -1;
