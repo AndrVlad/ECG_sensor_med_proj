@@ -73,6 +73,8 @@ volatile char TIM3_Trig = 0;
 uint8_t data_buf[256];
 bool write_cycle_closed = 0;
 bool reach_end_of_flash = 0; // флаг достижения конца флеш-памяти при чтении
+uint8_t uart1_rx_buf[2] = {0};
+bool uart1_rx_complete = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -265,13 +267,26 @@ int main(void)
   sensorInit();
 
   static uint8_t page_save_buf[256], page_save_buf_ptr = 0; //256 byte temp buf for flash page and ptr to its head
-
+  HAL_UART_Receive_IT(&huart1, uart1_rx_buf, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+/*
+	  if (uart1_rx_complete) {
+	  	uart1_rx_complete = 0;
+
+	  	//MY_HAL_TIM_OnePulse_Start(&htim2, TIM_CHANNEL_4);
+	  		// задержка для удержания линии в активном уровне
+
+	  		//__HAL_TIM_ENABLE(&htim2);
+
+	  	HAL_UART_Receive_IT(&huart1, uart1_rx_buf, 1);
+
+	  } */
+
 	  if (spi_rx_complete) {
 		  spi_rx_complete = false;
 		  parserFSM();
@@ -565,7 +580,7 @@ static void MX_TIM2_Init(void)
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
   sConfigOC.Pulse = 1;
-  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_LOW;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
   {
@@ -639,7 +654,7 @@ static void MX_USART1_UART_Init(void)
 
   /* USER CODE END USART1_Init 1 */
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 500000;
+  huart1.Init.BaudRate = 19200;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;

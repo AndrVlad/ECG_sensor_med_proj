@@ -60,7 +60,7 @@ void resetSPIConnection() {
 void initResponseBuffer() {
 	wait_response_frame[0] = 0xFA;
 	wait_response_frame[1] = 0xAF;
-	wait_response_frame[1] = STATE_WAIT;
+	wait_response_frame[2] = STATE_WAIT;
 	wait_response_frame[258] = 0xFF;
 	wait_response_frame[259] = 0x0D;
 	// TODO: добавить расчет CRC

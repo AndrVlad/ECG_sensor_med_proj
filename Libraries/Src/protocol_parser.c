@@ -213,7 +213,7 @@ void fillDataFrame() {
 	response[258] = 0xFF;
 	response[259] = 0x0B;
 
-	response[257] = FSM_state;
+	//response[257] = FSM_state;
 
 	// формирование CRC для кадра в порядке MSB
 	uint32_t crc = calculateCRC32(response,FRAME_LEN-4);

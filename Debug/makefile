@@ -55,6 +55,9 @@ default.size.stdout \
 OBJDUMP_LIST += \
 ECG_sensor.list \
 
+OBJCOPY_HEX += \
+ECG_sensor.hex \
+
 
 # All Target
 all: main-build
@@ -78,12 +81,17 @@ ECG_sensor.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
+ECG_sensor.hex: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O ihex $(EXECUTABLES) "ECG_sensor.hex"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
-	-$(RM) ECG_sensor.elf ECG_sensor.list ECG_sensor.map default.size.stdout
+	-$(RM) ECG_sensor.elf ECG_sensor.hex ECG_sensor.list ECG_sensor.map default.size.stdout
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_HEX)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'
