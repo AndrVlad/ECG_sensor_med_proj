@@ -470,6 +470,7 @@ void parserFSM() {
 			switch (safe_command_frame[2]) {
 			case CMD_GET_MEASURE:
 				setFSMProtocolState(MEASUREMENT_EXCHANGE_STATE);
+				fillDataFrame();
 				break;
 			case CMD_STATUS:
 				// обновление числа готовых для измерения

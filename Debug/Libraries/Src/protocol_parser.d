@@ -1,7 +1,7 @@
 Libraries/Src/protocol_parser.o: ../Libraries/Src/protocol_parser.c \
- C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Libraries/Inc/protocol_common.h \
- C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Libraries/Inc/protocol_parser.h \
- C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Libraries/Inc/SPI_Connection.h \
+ C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Libraries/Inc/protocol_common.h \
+ C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Libraries/Inc/protocol_parser.h \
+ C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Libraries/Inc/SPI_Connection.h \
  ../Core/Inc/main.h ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
  ../Core/Inc/stm32f1xx_hal_conf.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h \
@@ -28,13 +28,13 @@ Libraries/Src/protocol_parser.o: ../Libraries/Src/protocol_parser.c \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h \
- C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Drivers/25Q/w25q_spi.h \
- C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Libraries/Inc/sensor_utils.h \
- C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Drivers/ADS1293/ADS1293.h \
+ C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Drivers/25Q/w25q_spi.h \
+ C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Libraries/Inc/sensor_utils.h \
+ C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Drivers/ADS1293/ADS1293.h \
  ../Core/Inc/Common.h
-C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Libraries/Inc/protocol_common.h:
-C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Libraries/Inc/protocol_parser.h:
-C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Libraries/Inc/SPI_Connection.h:
+C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Libraries/Inc/protocol_common.h:
+C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Libraries/Inc/protocol_parser.h:
+C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Libraries/Inc/SPI_Connection.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 ../Core/Inc/stm32f1xx_hal_conf.h:
@@ -62,7 +62,7 @@ C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Libraries/Inc/SPI_Connec
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h:
-C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Drivers/25Q/w25q_spi.h:
-C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Libraries/Inc/sensor_utils.h:
-C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Drivers/ADS1293/ADS1293.h:
+C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Drivers/25Q/w25q_spi.h:
+C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Libraries/Inc/sensor_utils.h:
+C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Drivers/ADS1293/ADS1293.h:
 ../Core/Inc/Common.h:

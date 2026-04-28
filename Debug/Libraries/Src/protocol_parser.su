@@ -8,9 +8,9 @@
 ../Libraries/Src/protocol_parser.c:365:6:sendPreviousResponse	8	static
 ../Libraries/Src/protocol_parser.c:378:6:updateSavedResponse	24	static
 ../Libraries/Src/protocol_parser.c:402:6:parserFSM	8	static
-../Libraries/Src/protocol_parser.c:603:6:checkCRC32	24	static
-../Libraries/Src/protocol_parser.c:620:10:calculateCRC32	24	static
-../Libraries/Src/protocol_parser.c:628:6:sensorInit	8	static
-../Libraries/Src/protocol_parser.c:660:6:sendInitCTRL	4	static
-../Libraries/Src/protocol_parser.c:665:6:sendRxCompleteCTRL	4	static
-../Libraries/Src/protocol_parser.c:671:6:resetFSMProtocol	8	static
+../Libraries/Src/protocol_parser.c:604:6:checkCRC32	24	static
+../Libraries/Src/protocol_parser.c:621:10:calculateCRC32	24	static
+../Libraries/Src/protocol_parser.c:629:6:sensorInit	8	static
+../Libraries/Src/protocol_parser.c:661:6:sendInitCTRL	4	static
+../Libraries/Src/protocol_parser.c:666:6:sendRxCompleteCTRL	4	static
+../Libraries/Src/protocol_parser.c:672:6:resetFSMProtocol	8	static

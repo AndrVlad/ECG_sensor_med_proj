@@ -64,7 +64,7 @@ void initResponseBuffer() {
 	wait_response_frame[258] = 0xFF;
 	wait_response_frame[259] = 0x0D;
 	// TODO: добавить расчет CRC
-	uint32_t crc = calculateCRC32(wait_response_frame, FRAME_LEN);
+	uint32_t crc = calculateCRC32(wait_response_frame, FRAME_LEN-4);
 	wait_response_frame[260] = (crc >> 24) & 0xFF;
 	wait_response_frame[261] = (crc >> 16) & 0xFF;
 	wait_response_frame[262] = (crc >> 8) & 0xFF;
