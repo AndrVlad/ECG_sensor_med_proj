@@ -1,7 +1,7 @@
 SPI_Connection.c:27:6:HAL_GPIO_EXTI_Callback	5
-SPI_Connection.c:43:6:fillBuffer	2
-SPI_Connection.c:48:6:initSPIConnection	1
-SPI_Connection.c:55:6:resetSPIConnection	1
-SPI_Connection.c:60:6:initResponseBuffer	1
-SPI_Connection.c:74:6:switchBuffer	2
-SPI_Connection.c:84:6:HAL_SPI_TxRxCpltCallback	3
+SPI_Connection.c:59:6:fillBuffer	2
+SPI_Connection.c:64:6:initSPIConnection	1
+SPI_Connection.c:71:6:resetSPIConnection	1
+SPI_Connection.c:76:6:initResponseBuffer	1
+SPI_Connection.c:90:6:switchBuffer	2
+SPI_Connection.c:100:6:HAL_SPI_TxRxCpltCallback	3
