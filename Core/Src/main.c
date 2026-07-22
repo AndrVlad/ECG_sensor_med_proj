@@ -27,6 +27,7 @@
 #include "w25q_spi.h"
 #include "SPI_Connection.h"
 #include "protocol_parser.h"
+#include "exp_protocol.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -44,7 +45,7 @@
 /* USER CODE BEGIN PD */
 uint32_t ADS1293_data;
 int32_t ecgData;
-uint8_t ECG_raw[9];
+uint8_t ECG_raw[6], ECG_raw_safe[6];
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -56,8 +57,10 @@ uint8_t ECG_raw[9];
 SPI_HandleTypeDef hspi1;
 SPI_HandleTypeDef hspi2;
 
+TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
+TIM_HandleTypeDef htim4;
 
 UART_HandleTypeDef huart1;
 
@@ -73,8 +76,10 @@ volatile char TIM3_Trig = 0;
 uint8_t data_buf[256];
 bool write_cycle_closed = 0;
 bool reach_end_of_flash = 0; // флаг достижения конца флеш-памяти при чтении
-uint8_t uart1_rx_buf[2] = {0};
-bool uart1_rx_complete = 0;
+//uint8_t uart1_rx_buf[2] = {0};
+//bool uart1_rx_complete = 0;
+
+bool need_to_send = false;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -85,6 +90,8 @@ static void MX_USART1_UART_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM2_Init(void);
+static void MX_TIM1_Init(void);
+static void MX_TIM4_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -103,10 +110,11 @@ uint8_t* getECGdata(void)
   ECG_raw[4] = ads1293readdata(0x3B); //ch2 MID
   ECG_raw[3] = ads1293readdata(0x3C); //ch2 LSB
 
-  ECG_raw[8] = ads1293readdata(0x3D); //ch3 MSB
-  ECG_raw[7] = ads1293readdata(0x3E); //ch3 MID
-  ECG_raw[6] = ads1293readdata(0x3F); //ch3 LSB
-  return ECG_raw;
+  //ECG_raw[8] = ads1293readdata(0x3D); //ch3 MSB
+  //ECG_raw[7] = ads1293readdata(0x3E); //ch3 MID
+  //ECG_raw[6] = ads1293readdata(0x3F); //ch3 LSB
+  memcpy(ECG_raw_safe, ECG_raw,6);
+  return ECG_raw_safe;
 }
 
 void myDelay(void);
@@ -263,17 +271,29 @@ int main(void)
   MX_SPI1_Init();
   MX_TIM3_Init();
   MX_TIM2_Init();
+  MX_TIM1_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-  sensorInit();
-
+  ADS1293_Init();
+  uart_init();
   static uint8_t page_save_buf[256], page_save_buf_ptr = 0; //256 byte temp buf for flash page and ptr to its head
-  HAL_UART_Receive_IT(&huart1, uart1_rx_buf, 1);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+
+	if (uart1_rx_complete) {
+		parser_exp();
+	}
+
+	if (need_to_send) {
+		need_to_send = false;
+		send_data(getECGdata());
+	}
+
 /*
 	  if (uart1_rx_complete) {
 	  	uart1_rx_complete = 0;
@@ -286,7 +306,7 @@ int main(void)
 	  	HAL_UART_Receive_IT(&huart1, uart1_rx_buf, 1);
 
 	  } */
-
+	  /*
 	  if (spi_rx_complete) {
 		  spi_rx_complete = false;
 		  parserFSM();
@@ -407,7 +427,7 @@ int main(void)
 
 		// установка признака окончания стирания флеш-памяти (флаг проверяется в состоянии RESET_FLASH_STATE)
 		reset_ready = 1;
-	}
+	} */
 
     /* USER CODE END WHILE */
 
@@ -531,6 +551,52 @@ static void MX_SPI2_Init(void)
 }
 
 /**
+  * @brief TIM1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM1_Init(void)
+{
+
+  /* USER CODE BEGIN TIM1_Init 0 */
+
+  /* USER CODE END TIM1_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM1_Init 1 */
+
+  /* USER CODE END TIM1_Init 1 */
+  htim1.Instance = TIM1;
+  htim1.Init.Prescaler = 7199;
+  htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim1.Init.Period = 9;
+  htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim1.Init.RepetitionCounter = 0;
+  htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim1, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM1_Init 2 */
+
+  /* USER CODE END TIM1_Init 2 */
+
+}
+
+/**
   * @brief TIM2 Initialization Function
   * @param None
   * @retval None
@@ -612,9 +678,9 @@ static void MX_TIM3_Init(void)
 
   /* USER CODE END TIM3_Init 1 */
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 48000;
+  htim3.Init.Prescaler = 65535;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 5;
+  htim3.Init.Period = 1000;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
@@ -639,6 +705,51 @@ static void MX_TIM3_Init(void)
 }
 
 /**
+  * @brief TIM4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM4_Init(void)
+{
+
+  /* USER CODE BEGIN TIM4_Init 0 */
+
+  /* USER CODE END TIM4_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM4_Init 1 */
+
+  /* USER CODE END TIM4_Init 1 */
+  htim4.Instance = TIM4;
+  htim4.Init.Prescaler = 65535;
+  htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim4.Init.Period = 999;
+  htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM4_Init 2 */
+
+  /* USER CODE END TIM4_Init 2 */
+
+}
+
+/**
   * @brief USART1 Initialization Function
   * @param None
   * @retval None
@@ -654,7 +765,7 @@ static void MX_USART1_UART_Init(void)
 
   /* USER CODE END USART1_Init 1 */
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 19200;
+  huart1.Init.BaudRate = 250000;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;

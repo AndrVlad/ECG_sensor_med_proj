@@ -1,0 +1,4 @@
+../Core/Src/exp_protocol.c:13:6:parser_exp	8	static
+../Core/Src/exp_protocol.c:31:6:HAL_UART_RxCpltCallback	16	static
+../Core/Src/exp_protocol.c:40:6:uart_init	8	static
+../Core/Src/exp_protocol.c:45:6:send_data	24	static

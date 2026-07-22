@@ -25,10 +25,11 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h \
- C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Drivers/ADS1293/ADS1293.h \
- C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Drivers/25Q/w25q_spi.h \
- C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Libraries/Inc/SPI_Connection.h \
- C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Libraries/Inc/protocol_parser.h
+ C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Drivers/ADS1293/ADS1293.h \
+ C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Drivers/25Q/w25q_spi.h \
+ C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Libraries/Inc/SPI_Connection.h \
+ C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Libraries/Inc/protocol_parser.h \
+ ../Core/Inc/exp_protocol.h ../Core/Inc/main.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 ../Core/Inc/stm32f1xx_hal_conf.h:
@@ -56,7 +57,9 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h:
-C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Drivers/ADS1293/ADS1293.h:
-C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Drivers/25Q/w25q_spi.h:
-C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Libraries/Inc/SPI_Connection.h:
-C:/Users/Admin/Documents/GitHub/ECG_sensor_med_proj/Libraries/Inc/protocol_parser.h:
+C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Drivers/ADS1293/ADS1293.h:
+C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Drivers/25Q/w25q_spi.h:
+C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Libraries/Inc/SPI_Connection.h:
+C:/Users/vlado/STM32CubeIDE/workspace_1.12.0/ECG_sensor/Libraries/Inc/protocol_parser.h:
+../Core/Inc/exp_protocol.h:
+../Core/Inc/main.h:

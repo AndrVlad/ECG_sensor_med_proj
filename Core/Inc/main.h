@@ -64,6 +64,7 @@ extern volatile uint16_t page_ptr;
 extern bool write_cycle_closed;
 extern bool reach_end_of_flash;
 extern bool uart1_rx_complete;
+extern bool need_to_send;
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
