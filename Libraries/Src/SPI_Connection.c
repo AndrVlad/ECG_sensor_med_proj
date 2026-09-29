@@ -29,13 +29,15 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     // Мастер опустил CS
 	if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12) == GPIO_PIN_RESET) {
 
+		hspi2.Instance->CR1 &= ~SPI_CR1_SSI;
+
 		// восстановление нормальной работы вывода MISO
-    	GPIO_InitTypeDef GPIO_InitStruct = {0};
+    	/*GPIO_InitTypeDef GPIO_InitStruct = {0};
         GPIO_InitStruct.Pin = GPIO_PIN_14;
         GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
         GPIO_InitStruct.Pull = GPIO_NOPULL;
         GPIO_InitStruct.Speed =  GPIO_SPEED_FREQ_HIGH;
-        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct); */
 
 		// проверка на наличие готового ответа для отправки
 		if(response_ready && spi_state == SPI_MODE_TX) { 	// если ответ готов и датчик в режиме передатчика
@@ -47,12 +49,18 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 		// Запускаем прием/передачу
 		HAL_SPI_TransmitReceive_IT(&hspi2, spi_tx_ptr, spi_rx_ptr, FRAME_LEN);
     } else {
+    	//hspi2.Instance->CR1 |= SPI_CR1_SSI;
+
+    	//HAL_SPI_Abort_IT(&hspi2);
+    	__HAL_SPI_CLEAR_OVRFLAG(&hspi2);
+    	//volatile uint16_t tmp = hspi2.Instance->DR; (void)tmp;
+    	hspi2.Instance->CR1 |= SPI_CR1_SSI;
 
        	// сброс MISO в HiZ
-		GPIO_InitTypeDef GPIO_InitStruct = {0};
+		/*GPIO_InitTypeDef GPIO_InitStruct = {0};
 		GPIO_InitStruct.Pin = GPIO_PIN_14;
 		GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-		HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+		HAL_GPIO_Init(GPIOB, &GPIO_InitStruct); */
     }
 }
 
@@ -66,6 +74,7 @@ void initSPIConnection() {
 	switchBuffer(spi_state);
 	fillBuffer(dummy_frame, 0xAA);
 	initResponseBuffer();
+	hspi2.Instance->CR1 |= SPI_CR1_SSI;
 };
 
 void resetSPIConnection() {

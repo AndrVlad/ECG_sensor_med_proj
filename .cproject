@@ -165,15 +165,6 @@
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
-	<storageModule moduleId="scannerConfiguration">
-		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.release.412640961;com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.release.412640961.;com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.2061317626;com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1434452434">
-			<autodiscovery enabled="false" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.375309516;com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.375309516.;com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.481085251;com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.449279444">
-			<autodiscovery enabled="false" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-	</storageModule>
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="Debug">
 			<resource resourceType="PROJECT" workspacePath="/ECG_sensor"/>
@@ -182,4 +173,5 @@
 			<resource resourceType="PROJECT" workspacePath="/ECG_sensor"/>
 		</configuration>
 	</storageModule>
+	<storageModule moduleId="scannerConfiguration"/>
 </cproject>
