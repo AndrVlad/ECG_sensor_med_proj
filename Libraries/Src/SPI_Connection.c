@@ -52,7 +52,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     	//hspi2.Instance->CR1 |= SPI_CR1_SSI;
 
     	//HAL_SPI_Abort_IT(&hspi2);
-    	__HAL_SPI_CLEAR_OVRFLAG(&hspi2);
+
     	//volatile uint16_t tmp = hspi2.Instance->DR; (void)tmp;
     	hspi2.Instance->CR1 |= SPI_CR1_SSI;
 

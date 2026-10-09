@@ -1,4 +1,4 @@
-../Libraries/Src/SPI_Connection.c:27:6:HAL_GPIO_EXTI_Callback	24	static
+../Libraries/Src/SPI_Connection.c:27:6:HAL_GPIO_EXTI_Callback	16	static
 ../Libraries/Src/SPI_Connection.c:67:6:fillBuffer	24	static
 ../Libraries/Src/SPI_Connection.c:72:6:initSPIConnection	8	static
 ../Libraries/Src/SPI_Connection.c:80:6:resetSPIConnection	8	static

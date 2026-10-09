@@ -293,60 +293,7 @@ int main(void)
 	  }
 
 	 //commands
-	  if(dt1[0] == '0') //erase mem
-	  {
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
-		W25_Erase_Chip();
-		page_ptr = 0;
-#ifndef SDP_MODE
-		uint8_t pData[5] = {"0!\r\n"};
-		HAL_UART_Transmit(&huart1, pData, 4, 100);
-#endif
-	  }
-	  if(dt1[0] == '1') //start measure
-	  {
-		uart_mode = 0;
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
-		need_save = 1;
-		//test.number = 0;
-#ifndef SDP_MODE
-		uint8_t pData[5] = {"1!\r\n"};
-		HAL_UART_Transmit(&huart1, pData, 4, 100);
-#endif
-	  }
-	  if(dt1[0] == '2') //stop measure
-	  {
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
-		W25_Ini(0);
-		need_save = 0;
-#ifndef SDP_MODE
-		uint8_t pData[5] = {"2!\r\n"};
-		HAL_UART_Transmit(&huart1, pData, 4, 100);
-#endif
-	  }
-	  if(dt1[0] == '3') //read mem, page addr in dt1[2..1]
-	  {
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
 
-#ifdef SDP_MODE
-		for ( uint32_t read_page_addr = 0; read_page_addr < 3900; read_page_addr++)
-		{
-		  W25_Read_Page(data_buf, read_page_addr, 0, w25_info.PageSize);
-		  if ( (data_buf[0] == 0xFF) && (data_buf[1] == 0xFF) && (data_buf[2] == 0xFF) )
-			break;
-		  HAL_UART_Transmit(&huart1, data_buf, 256, 100);
-		}
-#endif
-
-#ifndef SDP_MODE
-		uint32_t read_page_addr = (dt1[2]<<8);
-		read_page_addr |= dt1[1];
-		W25_Read_Page(data_buf, read_page_addr, 0, w25_info.PageSize);
-		HAL_UART_Transmit(&huart1, data_buf, w25_info.PageSize, 100);
-		uint8_t pData[7] = {"\r\n3!\r\n"};
-		HAL_UART_Transmit(&huart1, pData, 6, 100);
-#endif
-	  }
 
    //ECG MODULE
 	if(TIM3_Trig == 1)
@@ -729,7 +676,7 @@ static void MX_GPIO_Init(void)
   HAL_NVIC_SetPriority(EXTI9_5_IRQn, 3, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
-  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 2, 0);
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 1, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */

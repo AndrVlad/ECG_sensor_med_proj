@@ -105,10 +105,12 @@ void resetSensorChip() {
 }
 
 void stopSensorChip() {
+	ADS1293_WriteReg(0x00, 0x00);
 	return;
 }
 
 void enableSensorChip() {
+	ADS1293_WriteReg(0x00, 0x01);
 	return;
 }
 
@@ -148,7 +150,7 @@ void startMeasurement() {
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
 	// установка флага начала записи данных во флеш-память (равносильно началу измерения)
 	need_save = 1;
-	//enableSensorChip();
+	enableSensorChip();
 	return;
 }
 
@@ -159,7 +161,7 @@ void stopMeasurement() {
 	W25_Ini(0);
 	// сброс флага записи данных во флеш-память (равносильно окончанию измерения)
 	need_save = 0;
-	//stopSensorChip();
+	stopSensorChip();
 	return;
 }
 

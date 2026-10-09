@@ -66,6 +66,6 @@ void ADS1293_Init()
   HAL_Delay(1);
   ADS1293_WriteReg(0x2F, 0x70); // Selikhov
   HAL_Delay(1);
-  ADS1293_WriteReg(0x00, 0x01); // Start data conversion
+  //ADS1293_WriteReg(0x00, 0x01); // Start data conversion
   HAL_Delay(1);
 }
