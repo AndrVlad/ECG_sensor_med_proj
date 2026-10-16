@@ -95,17 +95,31 @@ volatile uint8_t dt1[10];
 
 uint8_t* getECGdata(void)
 {
-  ECG_raw[2] = ads1293readdata(0x37); //ch1 MSB
-  ECG_raw[1] = ads1293readdata(0x38); //ch1 MID
-  ECG_raw[0] = ads1293readdata(0x39); //ch1 LSB
+	ECG_raw[2] = ads1293readdata(0x39); //ch1 LSB
+	ECG_raw[1] = ads1293readdata(0x38); //ch1 MID
+	ECG_raw[0] = ads1293readdata(0x37); //ch1 MSB
 
-  ECG_raw[5] = ads1293readdata(0x3A); //ch2 MSB
-  ECG_raw[4] = ads1293readdata(0x3B); //ch2 MID
-  ECG_raw[3] = ads1293readdata(0x3C); //ch2 LSB
+	ECG_raw[5] = ads1293readdata(0x3C); //ch2 LSB
+	ECG_raw[4] = ads1293readdata(0x3B); //ch2 MID
+	ECG_raw[3] = ads1293readdata(0x3A); //ch2 MSB
 
-  ECG_raw[8] = ads1293readdata(0x3D); //ch3 MSB
-  ECG_raw[7] = ads1293readdata(0x3E); //ch3 MID
-  ECG_raw[6] = ads1293readdata(0x3F); //ch3 LSB
+	  ECG_raw[8] = ads1293readdata(0x3F); //ch3 LSB
+	  ECG_raw[7] = ads1293readdata(0x3E); //ch3 MID
+	  ECG_raw[6] = ads1293readdata(0x3D); //ch3 MSB
+
+	/*
+  ECG_raw[2] = 0x5D;//ads1293readdata(0x37); //ch1 MSB
+  ECG_raw[1] = 0x5F;//ads1293readdata(0x38); //ch1 MID
+  ECG_raw[0] = 0xCD;//ads1293readdata(0x39); //ch1 LSB
+
+  ECG_raw[5] = 0x7B;//ads1293readdata(0x3A); //ch2 MSB
+  ECG_raw[4] = 0xE4;//ads1293readdata(0x3B); //ch2 MID
+  ECG_raw[3] = 0x4D;//ads1293readdata(0x3C); //ch2 LSB
+
+  ECG_raw[8] = 0x9A;//ads1293readdata(0x3D); //ch3 MSB
+  ECG_raw[7] = 0x68;//ads1293readdata(0x3E); //ch3 MID
+  ECG_raw[6] = 0xCD;//ads1293readdata(0x3F); //ch3 LSB
+  */
   return ECG_raw;
 }
 
